@@ -1,0 +1,58 @@
+version: '3'
+
+services:
+  postgresql:
+    build:
+      context: ..
+      dockerfile: ./requirements/postgresql/dockerfile
+    image: db
+    container_name: db_con
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    networks:
+      - task
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  migrate:
+    build:
+      context: ..
+      dockerfile: ./requirements/migrate/dockerfile
+    container_name: migrate_con
+    depends_on:
+      - postgresql
+    env_file:
+      - .env
+    networks:
+      - task
+    restart: "no"
+
+
+  app:
+    build:
+      context: ..
+      dockerfile: ./requirements/app/dockerfile
+    container_name: app_con
+    ports:
+      - "8080:8080"
+    depends_on:
+      - migrate
+    env_file:
+      - .env
+    networks:
+      - task
+    restart: unless-stopped
+
+networks:
+  task:
+    driver: bridge 

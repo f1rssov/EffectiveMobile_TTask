@@ -1,0 +1,370 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/subscriptions": {
+            "get": {
+                "description": "Обработчик GET /subscriptions с параметрами фильтрации. Возвращает список подписок с возможной фильтрацией по user_id, service_name, start_date и end_date",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "subscriptions"
+                ],
+                "summary": "Получить список подписок",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Subscription"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Ошибка валидации входных параметров (например, неверный UUID или формат даты)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Создает новую запись о подпискена основе JSON-запроса. обработчик POST /subscriptions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "subscriptions"
+                ],
+                "summary": "Создать подписку",
+                "parameters": [
+                    {
+                        "description": "Данные подписки",
+                        "name": "subscription",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Subscription"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Подписка успешно создана",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Ошибка запроса",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/subscriptions/total_price": {
+            "get": {
+                "description": "Обработчик GET /subscriptions/total_price.Считает стоимость подписок за период с фильтрацией по id пользователя и названию сервиса.\n/subscriptions/total_price?from_date={start_date}\u0026to_date={end_date}\u0026user_id={user_id}\u0026service_name={service_name}",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "subscriptions"
+                ],
+                "summary": "Посчитать суммарную стоимость подписок",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID пользователя",
+                        "name": "user_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Название сервиса",
+                        "name": "service_name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Начало периода (MM-YYYY)",
+                        "name": "start_date",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Конец периода (MM-YYYY)",
+                        "name": "end_date",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Общая сумма",
+                        "schema": {
+                            "$ref": "#/definitions/handler.TotalPriceResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Ошибка запроса",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/subscriptions/{user_id}/{service_name}/{start_date}": {
+            "get": {
+                "description": "Обработчик GET /subscriptions/:user_id/:service_name/:start_date. Получает подписку по user_id, service_name и start_date",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "subscriptions"
+                ],
+                "summary": "Получить подписку",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID пользователя",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Название сервиса",
+                        "name": "service_name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Дата начала подписки (MM-YYYY)",
+                        "name": "start_date",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Subscription"
+                        }
+                    },
+                    "404": {
+                        "description": "Подписка не найдена",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Обработчик PUT /subscriptions/:user_id/:service_name/:start_date Обновляет цену и дату окончания подписки по ключу user_id + service_name + start_date",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "subscriptions"
+                ],
+                "summary": "Обновить подписку",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID пользователя",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Название сервиса",
+                        "name": "service_name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Дата начала подписки (MM-YYYY)",
+                        "name": "start_date",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Обновленные данные подписки",
+                        "name": "subscription",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Subscription"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Подписка успешно обновлена",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Ошибка запроса",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Подписка не найдена",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Обработчик DELETE /subscriptions/:user_id/:service_name/:start_date.Удаляет подписку по user_id, service_name и start_date",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "subscriptions"
+                ],
+                "summary": "Удалить подписку",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID пользователя",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Название сервиса",
+                        "name": "service_name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Дата начала подписки (MM-YYYY)",
+                        "name": "start_date",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Подписка удалена",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Подписка не найдена",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "handler.TotalPriceResponse": {
+            "type": "object",
+            "properties": {
+                "total_price": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.Subscription": {
+            "description": "Подписка пользователя на онлайн-сервис. Используется для учёта затрат.",
+            "type": "object",
+            "properties": {
+                "end_date": {
+                    "description": "Опциональная дата окончания подписки (месяц и год)",
+                    "type": "string",
+                    "format": "MM-YYYY",
+                    "example": "12-2025"
+                },
+                "price": {
+                    "description": "Цена подписки в рублях",
+                    "type": "integer",
+                    "example": 999
+                },
+                "service_name": {
+                    "description": "Название сервиса, например \"Netflix\"",
+                    "type": "string",
+                    "example": "Netflix"
+                },
+                "start_date": {
+                    "description": "Дата начала подписки (месяц и год)",
+                    "type": "string",
+                    "format": "MM-YYYY",
+                    "example": "07-2025"
+                },
+                "user_id": {
+                    "description": "UUID пользователя",
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "4a79c82c-b09f-4cde-bf80-6edfd680793e"
+                }
+            }
+        }
+    }
+}

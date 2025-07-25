@@ -1,0 +1,260 @@
+definitions:
+  handler.TotalPriceResponse:
+    properties:
+      total_price:
+        type: integer
+    type: object
+  model.Subscription:
+    description: Подписка пользователя на онлайн-сервис. Используется для учёта затрат.
+    properties:
+      end_date:
+        description: Опциональная дата окончания подписки (месяц и год)
+        example: 12-2025
+        format: MM-YYYY
+        type: string
+      price:
+        description: Цена подписки в рублях
+        example: 999
+        type: integer
+      service_name:
+        description: Название сервиса, например "Netflix"
+        example: Netflix
+        type: string
+      start_date:
+        description: Дата начала подписки (месяц и год)
+        example: 07-2025
+        format: MM-YYYY
+        type: string
+      user_id:
+        description: UUID пользователя
+        example: 4a79c82c-b09f-4cde-bf80-6edfd680793e
+        format: uuid
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /subscriptions:
+    get:
+      description: Обработчик GET /subscriptions с параметрами фильтрации. Возвращает
+        список подписок с возможной фильтрацией по user_id, service_name, start_date
+        и end_date
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Subscription'
+            type: array
+        "400":
+          description: Ошибка валидации входных параметров (например, неверный UUID
+            или формат даты)
+          schema:
+            type: string
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      summary: Получить список подписок
+      tags:
+      - subscriptions
+    post:
+      consumes:
+      - application/json
+      description: Создает новую запись о подпискена основе JSON-запроса. обработчик
+        POST /subscriptions
+      parameters:
+      - description: Данные подписки
+        in: body
+        name: subscription
+        required: true
+        schema:
+          $ref: '#/definitions/model.Subscription'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Подписка успешно создана
+          schema:
+            type: string
+        "400":
+          description: Ошибка запроса
+          schema:
+            type: string
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      summary: Создать подписку
+      tags:
+      - subscriptions
+  /subscriptions/{user_id}/{service_name}/{start_date}:
+    delete:
+      description: Обработчик DELETE /subscriptions/:user_id/:service_name/:start_date.Удаляет
+        подписку по user_id, service_name и start_date
+      parameters:
+      - description: UUID пользователя
+        in: path
+        name: user_id
+        required: true
+        type: string
+      - description: Название сервиса
+        in: path
+        name: service_name
+        required: true
+        type: string
+      - description: Дата начала подписки (MM-YYYY)
+        in: path
+        name: start_date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Подписка удалена
+          schema:
+            type: string
+        "404":
+          description: Подписка не найдена
+          schema:
+            type: string
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      summary: Удалить подписку
+      tags:
+      - subscriptions
+    get:
+      description: Обработчик GET /subscriptions/:user_id/:service_name/:start_date.
+        Получает подписку по user_id, service_name и start_date
+      parameters:
+      - description: UUID пользователя
+        in: path
+        name: user_id
+        required: true
+        type: string
+      - description: Название сервиса
+        in: path
+        name: service_name
+        required: true
+        type: string
+      - description: Дата начала подписки (MM-YYYY)
+        in: path
+        name: start_date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Subscription'
+        "404":
+          description: Подписка не найдена
+          schema:
+            type: string
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      summary: Получить подписку
+      tags:
+      - subscriptions
+    put:
+      consumes:
+      - application/json
+      description: Обработчик PUT /subscriptions/:user_id/:service_name/:start_date
+        Обновляет цену и дату окончания подписки по ключу user_id + service_name +
+        start_date
+      parameters:
+      - description: UUID пользователя
+        in: path
+        name: user_id
+        required: true
+        type: string
+      - description: Название сервиса
+        in: path
+        name: service_name
+        required: true
+        type: string
+      - description: Дата начала подписки (MM-YYYY)
+        in: path
+        name: start_date
+        required: true
+        type: string
+      - description: Обновленные данные подписки
+        in: body
+        name: subscription
+        required: true
+        schema:
+          $ref: '#/definitions/model.Subscription'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Подписка успешно обновлена
+          schema:
+            type: string
+        "400":
+          description: Ошибка запроса
+          schema:
+            type: string
+        "404":
+          description: Подписка не найдена
+          schema:
+            type: string
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      summary: Обновить подписку
+      tags:
+      - subscriptions
+  /subscriptions/total_price:
+    get:
+      description: |-
+        Обработчик GET /subscriptions/total_price.Считает стоимость подписок за период с фильтрацией по id пользователя и названию сервиса.
+        /subscriptions/total_price?from_date={start_date}&to_date={end_date}&user_id={user_id}&service_name={service_name}
+      parameters:
+      - description: UUID пользователя
+        in: query
+        name: user_id
+        type: string
+      - description: Название сервиса
+        in: query
+        name: service_name
+        type: string
+      - description: Начало периода (MM-YYYY)
+        in: query
+        name: start_date
+        required: true
+        type: string
+      - description: Конец периода (MM-YYYY)
+        in: query
+        name: end_date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Общая сумма
+          schema:
+            $ref: '#/definitions/handler.TotalPriceResponse'
+        "400":
+          description: Ошибка запроса
+          schema:
+            type: string
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      summary: Посчитать суммарную стоимость подписок
+      tags:
+      - subscriptions
+swagger: "2.0"

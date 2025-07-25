@@ -1,0 +1,16 @@
+FROM alpine:3.19
+
+RUN apk add --no-cache postgresql-client curl
+
+RUN curl -L https://github.com/golang-migrate/migrate/releases/download/v4.18.3/migrate.linux-amd64.tar.gz \
+    -o /tmp/migrate.tar.gz && \
+    tar -xzf /tmp/migrate.tar.gz -C /usr/local/bin && \
+    chmod +x /usr/local/bin/migrate && \
+    rm -f /tmp/migrate.tar.gz
+
+COPY requirements/migrate/tools/migrations /migrations
+COPY requirements/migrate/tools/migrate-entrypoint.sh /usr/local/bin/migrate-entrypoint.sh
+
+RUN chmod +x /usr/local/bin/migrate-entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/migrate-entrypoint.sh"]

@@ -1,0 +1,12 @@
+FROM golang:1.24-alpine AS builder
+RUN apk add --no-cache git
+WORKDIR /app
+COPY ./requirements/app/go.mod ./requirements/app/go.sum ./
+RUN go mod download
+COPY ./requirements/app/ .
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o app ./cmd
+
+FROM scratch
+COPY --from=builder /app/app /app/app
+WORKDIR /app
+CMD ["/app/app"]
