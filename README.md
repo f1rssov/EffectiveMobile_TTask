@@ -102,4 +102,4 @@ REST API-сервис для учёта онлайн-подписок польз
     DB_PASS=your_password
     DB_NAME=subscriptions
     DB_HOST=db
-    ```
+```
