@@ -23,17 +23,6 @@ REST API-сервис для учёта онлайн-подписок польз
 ---
 
 ##  📁 Структура проекта
-srcs/
-├── config/ # Docker Compose и .env
-├── docs/ # Автогенерированная Swagger-документация
-├── internal/
-│ ├── handler/ # HTTP-обработчики
-│ ├── model/ # Структуры данных
-│ ├── repository/ # Доступ к данным (PostgreSQL)
-│ └── storage/ # Инициализация хранилища
-├── cmd/
-│ └── app/ # Точка входа (main.go)
-└── migrations/ # SQL-миграции базы данных
 <img width="310" height="187" alt="Снимок экрана 2025-07-25 в 11 33 27" src="https://github.com/user-attachments/assets/925c197c-5467-481f-8d28-0260b4e57dbd" />
 
 
