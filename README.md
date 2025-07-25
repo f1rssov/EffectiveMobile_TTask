@@ -97,8 +97,7 @@ REST API-сервис для учёта онлайн-подписок польз
 ##  ⚙️ Переменные окружения
 
 Настраиваются в файле srcs/config/.env:
-    ```env
-
+```env
     DB_USER=postgres
     DB_PASS=your_password
     DB_NAME=subscriptions
