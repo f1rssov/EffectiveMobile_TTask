@@ -25,14 +25,23 @@ REST API-сервис для учёта онлайн-подписок польз
 ##  📁 Структура проекта
 srcs/
 ├── config/ # Docker Compose и .env
+
 ├── docs/ # Автогенерированная Swagger-документация
+
 ├── internal/
+
 │ ├── handler/ # HTTP-обработчики
+
 │ ├── model/ # Структуры данных
+
 │ ├── repository/ # Доступ к данным (PostgreSQL)
+
 │ └── storage/ # Инициализация хранилища
+
 ├── cmd/
+
 │ └── app/ # Точка входа (main.go)
+
 └── migrations/ # SQL-миграции базы данных
 
 
